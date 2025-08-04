@@ -1,0 +1,119 @@
+project: MedBoard AI Tutor
+description: >
+  A containerized, cloud-portable platform that helps medical students prepare for board exams
+  through an adaptive AI tutor. It features board-level clinical Q&A, a performance dashboard,
+  personalized feedback, and comprehensive learning analytics. Designed for multi-provider sign-on,
+  unified account progress tracking, and institutional SSO support.
+
+phases:
+  - phase: "Phase 1: Core Infrastructure & Project Setup"
+    tasks:
+      - Initialize Git Repository & Monorepo Structure
+      - Backend Setup (FastAPI):
+        - Create requirements.txt with:
+          - fastapi
+          - uvicorn[standard]
+          - sqlalchemy
+          - psycopg2-binary
+          - alembic
+          - python-dotenv
+          - passlib[bcrypt]
+          - python-jose[cryptography]
+          - authlib
+          - python3-saml
+        - Create requirements-dev.txt with:
+          - pytest
+          - pytest-asyncio
+          - httpx
+          - factory-boy
+      - Database Schema (backend/models.py):
+        - Define User model (id, email, name, created_at)
+        - Define Identity model for multi-method login
+        - Define Question and Response models for Q&A history
+      - Database Migrations (Alembic):
+        - Initialize Alembic
+        - Generate and apply initial schema migration
+      - Testing Setup (backend/tests):
+        - Define pytest fixtures in conftest.py
+        - Async HTTPX client for API tests
+        - Create test database fixtures
+        - Override DB dependencies during test runs
+      - Docker & Frontend Setup:
+        - docker-compose with backend and PostgreSQL
+        - Dockerfile for backend
+        - Initialize frontend project and dependencies
+
+  - phase: "Phase 2: Multi-Provider Authentication System"
+    subphases:
+      - subphase: "Phase 2.1: Core Auth Logic & JWT"
+        tasks:
+          - Implement get_or_create_user_from_identity
+          - Generate and decode internal JWTs
+          - Factories for User and Identity
+          - Unit tests for user service logic
+      - subphase: "Phase 2.2: Standard Email/Password Login"
+        tasks:
+          - Backend: /api/auth/signup and /api/auth/login endpoints
+          - Frontend: Login and registration forms
+          - Integration tests for these endpoints
+      - subphase: "Phase 2.3: Social Login (Google OAuth2)"
+        tasks:
+          - Set up Google OAuth credentials
+          - Backend: /api/auth/google/login & /callback
+          - Frontend: Google login button and redirect handling
+          - Integration tests with mocked Google response
+      - subphase: "Phase 2.4: Institutional SSO (SAML/OIDC Foundation)"
+        tasks:
+          - DB model for SSO configuration
+          - Backend: /api/auth/sso/login & /callback
+          - Frontend: Flow for institutional email sign-in
+          - Integration tests with SAML/OIDC mock data
+
+  - phase: "Phase 3: Chatbot & AI-Driven Clinical Q&A"
+    tasks:
+      - JWT Route Protection:
+        - Create reusable FastAPI dependency to validate JWT
+        - Apply to all chatbot endpoints
+      - Chat Endpoints:
+        - /api/chat/question: Use Gemini API to generate board-style clinical questions
+        - /api/chat/answer: Log user answers to responses table with links to questions
+      - Frontend Chat UI:
+        - Build chat interface with conversation context
+        - Use JWT-authenticated axios instance
+        - Redirect on 401s to login page
+      - Testing:
+        - Authenticated client fixture
+        - Tests for endpoint access and correctness
+        - Mock Gemini API for test isolation
+
+  - phase: "Phase 4: Performance Analytics Dashboard"
+    tasks:
+      - Backend:
+        - /api/analytics/summary (JWT-protected)
+        - Aggregate data per user by specialty, topic, region
+      - Frontend:
+        - Build analytics dashboard with filters (discipline, anatomy, tags)
+        - Visualize performance with charting library (e.g., Recharts)
+      - Testing:
+        - Populate mock responses via factory
+        - Verify accurate analytics aggregation
+
+  - phase: "Phase 5: Adaptive Learning Engine"
+    tasks:
+      - Backend:
+        - /api/chat/next-recommended (JWT-protected)
+        - Identify user's weak areas from history
+        - Query Gemini API for targeted new questions
+      - Frontend:
+        - "Next Question" button triggers adaptive API
+      - Testing:
+        - Simulate users with weak categories
+        - Validate question targeting logic with mock data
+
+  - phase: "Phase 6: Deployment & Final Touches"
+    tasks:
+      - Optimize Dockerfile for production builds
+      - Build frontend assets with `npm run build`
+      - Provision production PostgreSQL (e.g., AWS RDS)
+      - Deploy backend (GCP Cloud Run / Azure / AWS)
+      - Deploy frontend (Ne
