@@ -6,7 +6,7 @@ from authlib.integrations.starlette_client import OAuth
 
 from backend import schemas
 from backend.models import Identity, SSOConfiguration
-from backend.main import get_db
+from backend.database import get_db
 from backend.services.user_service import get_or_create_user_from_identity
 from backend.auth.password import get_password_hash, verify_password
 from backend.auth.jwt import create_access_token

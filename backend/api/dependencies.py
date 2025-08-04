@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from backend.main import get_db
+from backend.database import get_db
 from backend.models import User
 from backend.auth.jwt import oauth2_scheme, verify_token
 

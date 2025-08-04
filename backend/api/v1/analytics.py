@@ -3,10 +3,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, case
 
 from backend import schemas
-from backend.main import get_db
+from backend.database import get_db
 from backend.models import User, Response, Question
 from backend.api.dependencies import get_current_user
 from backend.services.test_data_service import get_demo_analytics_data
+from backend.services.analytics_service import analytics_service
 
 router = APIRouter()
 
@@ -45,3 +46,25 @@ def get_analytics_summary(
     ]
 
     return {"performance_by_discipline": performance_by_discipline}
+
+@router.get("/detailed")
+def get_detailed_analytics(
+    days: int = 30,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get comprehensive user performance analytics with logging data.
+    """
+    return analytics_service.get_user_performance_stats(current_user.id, db, days)
+
+@router.get("/system-stats")
+def get_system_statistics(
+    days: int = 30,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get system-wide usage statistics (admin/monitoring endpoint).
+    """
+    return analytics_service.get_system_usage_stats(db, days)

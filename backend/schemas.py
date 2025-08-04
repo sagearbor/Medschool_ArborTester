@@ -22,7 +22,7 @@ class Question(BaseModel):
     discipline: str | None = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class AnswerCreate(BaseModel):
     question_id: int

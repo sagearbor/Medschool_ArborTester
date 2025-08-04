@@ -20,6 +20,9 @@ def test_creates_new_user_and_identity(db_session):
     assert user.identities[0].provider_user_id == "12345"
 
 def test_returns_existing_user_for_existing_identity(db_session):
+    IdentityFactory._meta.sqlalchemy_session = db_session
+    UserFactory._meta.sqlalchemy_session = db_session
+    
     existing_identity = IdentityFactory(provider="google", provider_user_id="54321")
     user_count = db_session.query(User).count()
     identity_count = db_session.query(Identity).count()
@@ -37,6 +40,9 @@ def test_returns_existing_user_for_existing_identity(db_session):
     assert user.id == existing_identity.user.id
 
 def test_links_new_identity_to_existing_user_by_email(db_session):
+    UserFactory._meta.sqlalchemy_session = db_session
+    IdentityFactory._meta.sqlalchemy_session = db_session
+    
     existing_user = UserFactory(email="existing.user@example.com")
     user_count = db_session.query(User).count()
     identity_count = db_session.query(Identity).count()

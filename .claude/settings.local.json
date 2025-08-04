@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(python -m pytest --tb=short)",
+      "Bash(npm run build:*)",
+      "Bash(pip install:*)",
+      "Bash(PYTHONPATH=\"/mnt/c/Users/scb2/AppData/Local/GitHubDesktop/app-3.4.20/Medschool_ArborTester\" python -m pytest backend/tests --tb=short -v)",
+      "Bash(PYTHONPATH=\"/mnt/c/Users/scb2/AppData/Local/GitHubDesktop/app-3.4.20/Medschool_ArborTester\" python -m pytest backend/tests/test_services/ --tb=short -v)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(PYTHONPATH=\"/mnt/c/Users/scb2/AppData/Local/GitHubDesktop/app-3.4.20/Medschool_ArborTester\" python -m pytest tests --tb=short -v)",
+      "Bash(PYTHONPATH=\"/mnt/c/Users/scb2/AppData/Local/GitHubDesktop/app-3.4.20/Medschool_ArborTester\" python -m pytest backend/tests/test_api/test_chat_api.py -v)",
+      "Bash(PYTHONPATH=\"/mnt/c/Users/scb2/AppData/Local/GitHubDesktop/app-3.4.20/Medschool_ArborTester\" python -m pytest backend/tests/test_api/test_chat_api.py::test_get_question_authenticated_sync -v)",
+      "Bash(PYTHONPATH=\"/mnt/c/Users/scb2/AppData/Local/GitHubDesktop/app-3.4.20/Medschool_ArborTester\" python -m pytest backend/tests/test_api/test_chat_api.py::test_submit_answer_authenticated -v)",
+      "Bash(PYTHONPATH=\"/mnt/c/Users/scb2/AppData/Local/GitHubDesktop/app-3.4.20/Medschool_ArborTester\" python -m pytest backend/tests/test_api/test_analytics_api.py -v)",
+      "Bash(PYTHONPATH=\"/mnt/c/Users/scb2/AppData/Local/GitHubDesktop/app-3.4.20/Medschool_ArborTester\" python -m pytest backend/tests/test_api/ -v --tb=short -k \"not async\")",
+      "Bash(PYTHONPATH=\"/mnt/c/Users/scb2/AppData/Local/GitHubDesktop/app-3.4.20/Medschool_ArborTester\" python -m pytest backend/tests/test_services/ -v)",
+      "Bash(python test_azure_openai.py:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(PYTHONPATH=\"/mnt/c/Users/scb2/AppData/Local/GitHubDesktop/app-3.4.20/Medschool_ArborTester\" pip install -r backend/requirements.txt)",
+      "Bash(export DATABASE_URL=\"sqlite:///./test.db\")",
+      "Bash(alembic upgrade:*)",
+      "Bash(export:*)",
+      "Bash(uvicorn:*)",
+      "Bash(python backend/tests/integration/test_azure_openai.py)",
+      "Bash(rm:*)",
+      "Bash(npm run dev:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)"
+    ],
+    "deny": []
+  }
+}

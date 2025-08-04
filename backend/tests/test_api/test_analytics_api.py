@@ -1,8 +1,7 @@
 import pytest
 from backend.models import Question, Response
 
-@pytest.mark.asyncio
-async def test_analytics_summary_returns_correct_aggregations(authenticated_client, db_session):
+def test_analytics_summary_returns_correct_aggregations(authenticated_client, db_session):
     client, user = authenticated_client
 
     q1 = Question(content="Cardiology Question", discipline="Cardiology")
@@ -19,7 +18,7 @@ async def test_analytics_summary_returns_correct_aggregations(authenticated_clie
     db_session.add_all(responses)
     db_session.commit()
 
-    response = await client.get("/api/v1/analytics/summary")
+    response = client.get("/api/v1/analytics/summary")
 
     assert response.status_code == 200
     data = response.json()["performance_by_discipline"]

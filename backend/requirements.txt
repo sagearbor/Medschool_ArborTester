@@ -8,3 +8,5 @@ passlib[bcrypt]
 python-jose[cryptography]
 authlib
 python3-saml
+openai
+httpx

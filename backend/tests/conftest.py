@@ -1,56 +1,91 @@
-"""Add SSO and Question features
+import os
+import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
-Revision ID: 1a2b3c4d5e6f
-Revises: cfc683876939
-Create Date: 2025-08-03 16:30:00.123456
+from backend.main import app
+from backend.database import get_db
+from backend.models import Base
+from backend.auth.jwt import create_access_token
 
-"""
-from alembic import op
-import sqlalchemy as sa
+# Test database configuration
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "sqlite:///./test.db")
+test_engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in TEST_DATABASE_URL else {})
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 
-revision = '1a2b3c4d5e6f'
-down_revision = 'cfc683876939'
-branch_labels = None
-depends_on = None
+@pytest.fixture(scope="session")
+def db_setup():
+    """Set up test database"""
+    Base.metadata.create_all(bind=test_engine)
+    yield
+    Base.metadata.drop_all(bind=test_engine)
 
-def upgrade() -> None:
-    op.create_table('sso_configurations',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('institution_name', sa.String(), nullable=False),
-    sa.Column('domain', sa.String(), nullable=False),
-    sa.Column('is_active', sa.Boolean(), nullable=True),
-    sa.Column('idp_entity_id', sa.String(), nullable=True),
-    sa.Column('idp_sso_url', sa.String(), nullable=True),
-    sa.Column('idp_x509_cert', sa.Text(), nullable=True),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('institution_name')
-    )
-    op.create_index(op.f('ix_sso_configurations_domain'), 'sso_configurations', ['domain'], unique=True)
-    op.create_index(op.f('ix_sso_configurations_id'), 'sso_configurations', ['id'], unique=False)
-
-    op.create_table('user_memory',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('condensed_history', sa.Text(), nullable=True),
-    sa.Column('last_updated', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('user_id')
-    )
+@pytest.fixture
+def db_session(db_setup):
+    """Create a fresh database session for each test"""
+    connection = test_engine.connect()
+    transaction = connection.begin()
+    session = TestingSessionLocal(bind=connection)
     
-    op.add_column('questions', sa.Column('discipline', sa.String(), nullable=True))
-    op.add_column('questions', sa.Column('upvotes', sa.Integer(), nullable=True))
-    op.add_column('questions', sa.Column('downvotes', sa.Integer(), nullable=True))
-    op.create_index(op.f('ix_questions_discipline'), 'questions', ['discipline'], unique=False)
+    yield session
+    
+    session.close()
+    transaction.rollback()
+    connection.close()
 
-def downgrade() -> None:
-    op.drop_index(op.f('ix_questions_discipline'), table_name='questions')
-    op.drop_column('questions', 'downvotes')
-    op.drop_column('questions', 'upvotes')
-    op.drop_column('questions', 'discipline')
+@pytest.fixture
+def override_get_db(db_session):
+    """Override the get_db dependency to use test database"""
+    def _override_get_db():
+        try:
+            yield db_session
+        finally:
+            pass
     
-    op.drop_table('user_memory')
+    app.dependency_overrides[get_db] = _override_get_db
+    yield
+    app.dependency_overrides.clear()
+
+@pytest.fixture
+def client(override_get_db):
+    """Create test client"""
+    return TestClient(app)
+
+@pytest.fixture
+async def async_client(override_get_db):
+    """Create async test client"""
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        yield ac
+
+@pytest.fixture
+async def async_authenticated_client(override_get_db, auth_headers, db_session):
+    """Create authenticated async test client with user"""
+    from backend.tests.factories import UserFactory
+    UserFactory._meta.sqlalchemy_session = db_session
     
-    op.drop_index(op.f('ix_sso_configurations_id'), table_name='sso_configurations')
-    op.drop_index(op.f('ix_sso_configurations_domain'), table_name='sso_configurations')
-    op.drop_table('sso_configurations')
+    user = UserFactory(id=1)  # Match the token's sub claim
+    async with AsyncClient(app=app, base_url="http://test", headers=auth_headers) as ac:
+        yield ac, user
+
+@pytest.fixture
+def auth_token():
+    """Create a test authentication token"""
+    return create_access_token(data={"sub": "1"})
+
+@pytest.fixture
+def auth_headers(auth_token):
+    """Create authorization headers for testing"""
+    return {"Authorization": f"Bearer {auth_token}"}
+
+@pytest.fixture
+def authenticated_client(override_get_db, auth_headers, db_session):
+    """Create authenticated test client with user"""
+    from backend.tests.factories import UserFactory
+    UserFactory._meta.sqlalchemy_session = db_session
+    
+    user = UserFactory(id=1)  # Match the token's sub claim
+    client = TestClient(app)
+    client.headers.update(auth_headers)
+    return client, user
