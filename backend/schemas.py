@@ -20,6 +20,11 @@ class Question(BaseModel):
     id: int
     content: str
     discipline: str | None = None
+    options: str | None = None
+    correct_answer: str | None = None
+    explanation: str | None = None
+    difficulty: str | None = None
+    topics: str | None = None
 
     class Config:
         from_attributes = True

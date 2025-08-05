@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import ChatWindow from '../components/ChatWindow';
+import Navigation from '../components/Navigation';
 
 export default function ChatPage() {
     const [token, setToken] = useState(null);
@@ -47,32 +48,7 @@ export default function ChatPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Navigation Header */}
-            <nav className="bg-white shadow-sm border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <div className="flex items-center">
-                            <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
-                                <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                </svg>
-                            </div>
-                            <h1 className="text-xl font-semibold text-gray-900">MedBoard AI Tutor</h1>
-                        </div>
-                        <div className="flex items-center space-x-4">
-                            <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition duration-200">
-                                Dashboard
-                            </Link>
-                            <button
-                                onClick={handleLogout}
-                                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition duration-200"
-                            >
-                                Logout
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <Navigation />
 
             {/* Main Content */}
             <main className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">

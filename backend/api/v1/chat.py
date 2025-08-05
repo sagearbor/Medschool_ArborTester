@@ -14,6 +14,11 @@ openai_service = OpenAIService()
 
 router = APIRouter()
 
+@router.get("/test")
+def test_endpoint(current_user: User = Depends(get_current_user)):
+    """Test endpoint to verify auth and basic functionality"""
+    return {"message": "Chat API is working", "user_id": current_user.id}
+
 @router.get("/question", response_model=schemas.Question)
 def get_next_question(
     specialty: str = "General Medicine",
@@ -25,7 +30,7 @@ def get_next_question(
     Generate a new clinical question using Azure OpenAI or return existing question.
     """
     try:
-        # Generate new question using OpenAI
+        # Try to generate new question using OpenAI first
         question_data = openai_service.generate_clinical_question(
             specialty=specialty,
             difficulty=difficulty
@@ -51,21 +56,35 @@ def get_next_question(
         return question
         
     except Exception as e:
-        logger.error(f"Error generating question: {str(e)}")
-        # Fallback to existing question or placeholder
-        question = db.query(Question).first()
-        if not question:
-            question = Question(
-                content="Sample clinical question: A 45-year-old patient presents with chest pain. What is the most appropriate next step?",
+        logger.error(f"Error generating question with OpenAI: {str(e)}")
+        
+        # Fallback to existing question first
+        existing_question = db.query(Question).filter(Question.discipline == specialty).first()
+        if existing_question:
+            logger.info(f"Returning existing question {existing_question.id} for user {current_user.id}")
+            return existing_question
+        
+        # If no existing question, create a fallback
+        try:
+            fallback_question = Question(
+                content=f"Sample {specialty} clinical question: A patient presents with symptoms related to {specialty.lower()}. What is the most appropriate next diagnostic step?",
                 discipline=specialty,
-                options='{"A": "ECG", "B": "Chest X-ray", "C": "Blood work", "D": "Discharge home"}',
-                correct_answer="A",
-                explanation="ECG is the most appropriate first step for chest pain evaluation."
+                options='{"A": "Order basic lab work", "B": "Perform physical examination", "C": "Order imaging study", "D": "Refer to specialist"}',
+                correct_answer="B",
+                explanation="A thorough physical examination is always an appropriate initial step in patient evaluation.",
+                difficulty=difficulty,
+                topics='["Clinical Assessment", "Diagnostic Approach"]'
             )
-            db.add(question)
+            db.add(fallback_question)
             db.commit()
-            db.refresh(question)
-        return question
+            db.refresh(fallback_question)
+            
+            logger.info(f"Created fallback question {fallback_question.id} for user {current_user.id}")
+            return fallback_question
+            
+        except Exception as db_error:
+            logger.error(f"Database error creating fallback question: {str(db_error)}")
+            raise HTTPException(status_code=500, detail="Unable to generate or retrieve question")
 
 @router.post("/answer")
 def submit_answer(

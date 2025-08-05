@@ -29,7 +29,10 @@
       "Bash(rm:*)",
       "Bash(npm run dev:*)",
       "Bash(node:*)",
-      "Bash(npm:*)"
+      "Bash(npm:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

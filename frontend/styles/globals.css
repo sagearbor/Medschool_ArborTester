@@ -1,0 +1,15 @@
+/*
+ * styles/globals.css
+ * This file is where you import the core Tailwind CSS directives.
+ * Next.js and PostCSS will process these directives to generate the final CSS file
+ * that contains all of Tailwind's utility classes based on your usage.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can also add any custom global styles here if needed */
+body {
+  font-family: 'Inter', sans-serif; /* A nice default font */
+}
