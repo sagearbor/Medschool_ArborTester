@@ -23,6 +23,8 @@ Adaptive Learning Engine: The system intelligently suggests new questions based 
 
 Unified Progress Logging: All progress, answers, and analytics are tied to a single user account, regardless of the login method used, providing a consistent and holistic view of the user's learning journey.
 
+AI-Powered Question Categorization: Questions are automatically tagged with structured medical taxonomy including disciplines, body systems, specialties, question types, and pathophysiology mechanisms. This enables rich analytics and precise performance tracking across multiple dimensions. The system uses a cost-optimized two-step AI process with swappable LLM backends for future local model integration.
+
 Tech Stack
 Frontend: React / Next.js with Tailwind CSS.
 
@@ -62,9 +64,33 @@ cd medboard-ai-tutor
 
 Configure Environment Variables:
 
-Create a .env file in the backend directory by copying the example: cp backend/.env.example backend/.env.
+Create a .env file in the project root directory with the following required variables:
 
-Fill in the required values in backend/.env, such as your database credentials, JWT secret key, and any API keys for auth providers.
+```bash
+# Database
+DATABASE_URL=sqlite:///./app.db
+TEST_DATABASE_URL=sqlite:///./test.db
+
+# JWT Authentication
+SECRET_KEY=your-secret-key-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# OAuth (optional)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# Azure OpenAI (required for question generation)
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+AZURE_OPENAI_API_KEY=your-azure-openai-api-key
+AZURE_OPENAI_API_VERSION=2024-02-01
+AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4
+
+# Question Tagging Backend (optional - defaults to azure_openai)
+TAGGING_BACKEND=azure_openai
+```
+
+You can also copy from the example: `cp backend/.env.example .env` and modify as needed.
 
 Launch the Backend:
 

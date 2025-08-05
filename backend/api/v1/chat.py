@@ -8,6 +8,7 @@ from backend.database import get_db
 from backend.models import User, Question, Response
 from backend.api.dependencies import get_current_user
 from backend.services.openai_service import OpenAIService
+from backend.services.tagging_service import get_tagging_service
 
 logger = logging.getLogger(__name__)
 openai_service = OpenAIService()
@@ -31,20 +32,43 @@ def get_next_question(
     """
     try:
         # Try to generate new question using OpenAI first
+        logger.info(f"Attempting to generate question for specialty: {specialty}, difficulty: {difficulty}")
         question_data = openai_service.generate_clinical_question(
             specialty=specialty,
             difficulty=difficulty
         )
+        logger.info(f"Successfully generated question: {question_data.get('question', 'N/A')[:100]}...")
         
-        # Store in database
+        # Tag the question using AI
+        try:
+            tagging_service = get_tagging_service()
+            tags = tagging_service.tag_question(
+                question_content=question_data["question"],
+                question_options=question_data["options"]
+            )
+            logger.info(f"Question tagged successfully: {tags}")
+        except Exception as tag_error:
+            logger.error(f"Error tagging question: {str(tag_error)}")
+            tags = {}
+
+        # Store in database with structured tags
         question = Question(
             content=question_data["question"],
-            discipline=question_data["specialty"],
+            discipline=question_data["specialty"],  # Legacy field
             options=json.dumps(question_data["options"]),
             correct_answer=question_data["correct_answer"],
             explanation=question_data["explanation"],
             difficulty=question_data["difficulty"],
-            topics=json.dumps(question_data.get("topics", []))
+            topics=json.dumps(question_data.get("topics", [])),  # Legacy field
+            
+            # New structured taxonomy fields
+            disciplines=json.dumps(tags.get("disciplines", [])),
+            body_systems=json.dumps(tags.get("body_systems", [])),
+            specialties=json.dumps(tags.get("specialties", [])),
+            question_type=tags.get("question_type"),
+            age_group=tags.get("age_group"),
+            acuity=tags.get("acuity"),
+            pathophysiology=json.dumps(tags.get("pathophysiology", []))
         )
         db.add(question)
         db.commit()
@@ -66,14 +90,36 @@ def get_next_question(
         
         # If no existing question, create a fallback
         try:
+            fallback_content = f"Sample {specialty} clinical question: A patient presents with symptoms related to {specialty.lower()}. What is the most appropriate next diagnostic step?"
+            fallback_options = {"A": "Order basic lab work", "B": "Perform physical examination", "C": "Order imaging study", "D": "Refer to specialist"}
+            
+            # Tag the fallback question
+            try:
+                tagging_service = get_tagging_service()
+                fallback_tags = tagging_service.tag_question(
+                    question_content=fallback_content,
+                    question_options=fallback_options
+                )
+            except Exception:
+                fallback_tags = {}
+            
             fallback_question = Question(
-                content=f"Sample {specialty} clinical question: A patient presents with symptoms related to {specialty.lower()}. What is the most appropriate next diagnostic step?",
-                discipline=specialty,
-                options='{"A": "Order basic lab work", "B": "Perform physical examination", "C": "Order imaging study", "D": "Refer to specialist"}',
+                content=fallback_content,
+                discipline=specialty,  # Legacy field
+                options=json.dumps(fallback_options),
                 correct_answer="B",
                 explanation="A thorough physical examination is always an appropriate initial step in patient evaluation.",
                 difficulty=difficulty,
-                topics='["Clinical Assessment", "Diagnostic Approach"]'
+                topics='["Clinical Assessment", "Diagnostic Approach"]',  # Legacy field
+                
+                # New structured taxonomy fields
+                disciplines=json.dumps(fallback_tags.get("disciplines", [specialty.lower().replace(" ", "_")])),
+                body_systems=json.dumps(fallback_tags.get("body_systems", ["general"])),
+                specialties=json.dumps(fallback_tags.get("specialties", ["internal_medicine"])),
+                question_type=fallback_tags.get("question_type", "diagnosis"),
+                age_group=fallback_tags.get("age_group", "adult"),
+                acuity=fallback_tags.get("acuity", "routine"),
+                pathophysiology=json.dumps(fallback_tags.get("pathophysiology", []))
             )
             db.add(fallback_question)
             db.commit()

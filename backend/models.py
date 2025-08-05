@@ -49,12 +49,22 @@ class Question(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     content = Column(Text, nullable=False)
-    discipline = Column(String, index=True)
+    discipline = Column(String, index=True)  # Legacy field, kept for compatibility
     options = Column(Text, nullable=True)  # JSON string of multiple choice options
     correct_answer = Column(String, nullable=True)
     explanation = Column(Text, nullable=True)
     difficulty = Column(String, nullable=True)
-    topics = Column(Text, nullable=True)  # JSON string of topic tags
+    topics = Column(Text, nullable=True)  # Legacy field, kept for compatibility
+    
+    # New structured taxonomy fields
+    disciplines = Column(Text, nullable=True)  # JSON array: ["cardiology", "pharmacology"]
+    body_systems = Column(Text, nullable=True)  # JSON array: ["cardiovascular", "respiratory"]
+    specialties = Column(Text, nullable=True)  # JSON array: ["internal_medicine", "emergency"]
+    question_type = Column(String, nullable=True)  # Single value: "diagnosis", "treatment", etc.
+    age_group = Column(String, nullable=True)  # Single value: "adult", "pediatric", etc.
+    acuity = Column(String, nullable=True)  # Single value: "life_threatening", "routine", etc.
+    pathophysiology = Column(Text, nullable=True)  # JSON array: ["infectious", "autoimmune"]
+    
     upvotes = Column(Integer, default=0)
     downvotes = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)

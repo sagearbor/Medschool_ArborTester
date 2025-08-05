@@ -47,6 +47,7 @@ npm run lint       # ESLint
 - **PostgreSQL** database via Docker Compose
 - **JWT-based** authentication with multi-provider support
 - **Modular design**: separate modules for auth, chat, analytics
+- **AI-Powered Question Tagging**: Automatic categorization with swappable LLM backends
 
 ### Key Models
 - `User`: Core user entity with relationships to identities and responses
@@ -74,6 +75,19 @@ npm run lint       # ESLint
 - Test database isolation for pytest
 - Foreign key relationships for data integrity
 
+### Question Tagging System
+- **Two-step AI process**: Question generation + structured categorization
+- **Swappable backends**: Azure OpenAI (default) or local LLM via `TAGGING_BACKEND` env var
+- **Structured taxonomy**: 12 orthogonal dimensions including:
+  - Disciplines (anatomy, pharmacology, etc.)
+  - Body systems (cardiovascular, respiratory, etc.)
+  - Specialties (internal medicine, surgery, etc.)
+  - Question types (diagnosis, treatment, mechanism, etc.)
+  - Patient demographics (age groups, acuity levels)
+  - Pathophysiology mechanisms (infectious, autoimmune, etc.)
+- **Analytics-ready**: Enables rich dashboard filtering and performance tracking
+- **Cost-optimized**: Designed for expensive generation model + cheap local tagging model
+
 ## Testing Strategy
 
 ### Backend Testing
@@ -94,7 +108,12 @@ npm run lint       # ESLint
 - `DATABASE_URL`: PostgreSQL connection string
 - JWT secret keys for token generation
 - OAuth provider credentials (Google, etc.)
-- Gemini API key for question generation
+- Azure OpenAI credentials for question generation and tagging:
+  - `AZURE_OPENAI_API_KEY`: Your Azure OpenAI API key
+  - `AZURE_OPENAI_ENDPOINT`: Azure OpenAI endpoint URL
+  - `AZURE_OPENAI_API_VERSION`: API version (e.g., "2024-02-01")
+  - `AZURE_OPENAI_DEPLOYMENT_NAME`: Model deployment name (e.g., "gpt-4")
+- Optional: `TAGGING_BACKEND`: "azure_openai" (default) or "local_llm" for question categorization
 
 ### Docker Configuration
 - `docker-compose.yml` includes PostgreSQL and backend services

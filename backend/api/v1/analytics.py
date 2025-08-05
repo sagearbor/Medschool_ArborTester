@@ -24,25 +24,40 @@ def get_analytics_summary(
     if useTestData:
         return get_demo_analytics_data()
 
-    performance_stats = db.query(
-        Question.discipline,
-        func.count(Response.id).label("total_answered"),
-        func.sum(case((Response.is_correct == True, 1), else_=0)).label("correct_count")
-    ).join(
+    # Get all user responses with their question details
+    user_responses = db.query(Response, Question).join(
         Question, Response.question_id == Question.id
     ).filter(
         Response.user_id == current_user.id
-    ).group_by(
-        Question.discipline
     ).all()
+
+    # Parse structured disciplines from each question and aggregate
+    discipline_stats = {}
+    
+    for response, question in user_responses:
+        # Parse disciplines from JSON field (fallback to legacy field)
+        try:
+            import json
+            disciplines = json.loads(question.disciplines) if question.disciplines else [question.discipline or "General Medicine"]
+        except:
+            disciplines = [question.discipline or "General Medicine"]
+        
+        # Count stats for each discipline this question belongs to
+        for discipline in disciplines:
+            if discipline not in discipline_stats:
+                discipline_stats[discipline] = {"total": 0, "correct": 0}
+            
+            discipline_stats[discipline]["total"] += 1
+            if response.is_correct:
+                discipline_stats[discipline]["correct"] += 1
 
     performance_by_discipline = [
         schemas.DisciplinePerformance(
-            discipline=row.discipline,
-            total_answered=row.total_answered,
-            correct_count=row.correct_count,
-            accuracy=(row.correct_count / row.total_answered) if row.total_answered > 0 else 0
-        ) for row in performance_stats
+            discipline=discipline,
+            total_answered=stats["total"],
+            correct_count=stats["correct"],
+            accuracy=(stats["correct"] / stats["total"]) if stats["total"] > 0 else 0
+        ) for discipline, stats in discipline_stats.items()
     ]
 
     return {"performance_by_discipline": performance_by_discipline}
