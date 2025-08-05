@@ -10,8 +10,12 @@ MedBoard AI Tutor is a containerized medical education platform that helps stude
 
 ### Backend (FastAPI)
 ```bash
-# Start development environment
+# Start development environment with Docker
 docker-compose up --build
+
+# Start development server directly (without Docker)
+# IMPORTANT: Run from project root, not from backend directory
+uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 
 # Run tests
 cd backend

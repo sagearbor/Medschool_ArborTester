@@ -32,7 +32,9 @@
       "Bash(npm:*)",
       "Bash(curl:*)",
       "Bash(pkill:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(alembic revision:*)",
+      "Bash(python:*)"
     ],
     "deny": []
   }

@@ -15,7 +15,6 @@ const createApiClient = (token) => {
 };
 
 export default function ChatWindow({ token }) {
-    const [apiClient, setApiClient] = useState(null);
     const [currentQuestion, setCurrentQuestion] = useState(null);
     const [userAnswer, setUserAnswer] = useState('');
     const [feedback, setFeedback] = useState('');
@@ -25,14 +24,20 @@ export default function ChatWindow({ token }) {
     const [difficulty, setDifficulty] = useState('Intermediate');
     const [customTopic, setCustomTopic] = useState('');
 
-    useEffect(() => {
-        setApiClient(createApiClient(token));
-    }, [token]);
 
     const handleApiError = (err) => {
         console.error('API Error:', err);
         if (err.response?.status === 401) {
-            setError("Authentication failed. Please log in again.");
+            // Clear invalid token
+            localStorage.removeItem('authToken');
+            
+            // Show prominent error message
+            setError("🔒 Your session has expired. Redirecting to login page...");
+            
+            // Redirect to login after 2 seconds
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 2000);
         } else {
             setError(err.response?.data?.detail || "An unexpected error occurred.");
         }
@@ -40,9 +45,11 @@ export default function ChatWindow({ token }) {
     };
 
     const fetchQuestion = async (requestedTopic = '') => {
-        if (!apiClient) return;
+        if (!token) return;
         setLoading(true);
         setError('');
+        
+        const client = createApiClient(token);
         
         try {
             let url = '/api/v1/chat/question';
@@ -60,7 +67,7 @@ export default function ChatWindow({ token }) {
             }
             
             console.log('Fetching question from:', url);
-            const response = await apiClient.get(url);
+            const response = await client.get(url);
             setCurrentQuestion(response.data);
             setFeedback('');
             setError('');
@@ -73,11 +80,12 @@ export default function ChatWindow({ token }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!currentQuestion || !apiClient || !userAnswer.trim()) return;
+        if (!currentQuestion || !token || !userAnswer.trim()) return;
 
+        const client = createApiClient(token);
         setLoading(true);
         try {
-            const response = await apiClient.post('/api/v1/chat/answer', {
+            const response = await client.post('/api/v1/chat/answer', {
                 question_id: currentQuestion.id,
                 user_answer: userAnswer,
             });
@@ -292,14 +300,18 @@ export default function ChatWindow({ token }) {
 
             {/* Error Display */}
             {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <p className="text-red-600"><strong>Error:</strong> {error}</p>
-                    <button
-                        onClick={() => fetchQuestion()}
-                        className="mt-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200"
-                    >
-                        Try Again
-                    </button>
+                <div className={`rounded-lg p-4 ${error.includes('🔒') ? 'bg-yellow-100 border-2 border-yellow-400' : 'bg-red-50 border border-red-200'}`}>
+                    <p className={`${error.includes('🔒') ? 'text-yellow-800 text-lg font-semibold' : 'text-red-600'}`}>
+                        <strong>{error.includes('🔒') ? '' : 'Error: '}</strong>{error}
+                    </p>
+                    {!error.includes('🔒') && (
+                        <button
+                            onClick={() => fetchQuestion()}
+                            className="mt-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200"
+                        >
+                            Try Again
+                        </button>
+                    )}
                 </div>
             )}
         </div>

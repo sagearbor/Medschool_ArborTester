@@ -83,9 +83,20 @@ cd frontend
 Install dependencies and start the development server:
 
 npm install
-npm start
+npm run dev
 
 The React application will be available at http://localhost:3000.
+
+## Development vs Production Commands
+
+### Frontend (Next.js)
+- **Development**: `npm run dev` - Hot reloading, development optimizations, runs on port 3000
+- **Production Build**: `npm run build` - Creates optimized production build
+- **Production Server**: `npm run start` - Serves the built production files
+
+### Backend (FastAPI)
+- **Development**: `uvicorn backend.main:app --reload` - Auto-reload on changes, runs on port 8000
+- **Production**: `uvicorn backend.main:app --host 0.0.0.0 --port 8000` - No auto-reload, optimized for production
 
 Testing
 This project uses pytest for comprehensive testing. Tests are designed to be run against an isolated test database to ensure they are independent and do not affect development data.

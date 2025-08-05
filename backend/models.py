@@ -50,6 +50,11 @@ class Question(Base):
     id = Column(Integer, primary_key=True, index=True)
     content = Column(Text, nullable=False)
     discipline = Column(String, index=True)
+    options = Column(Text, nullable=True)  # JSON string of multiple choice options
+    correct_answer = Column(String, nullable=True)
+    explanation = Column(Text, nullable=True)
+    difficulty = Column(String, nullable=True)
+    topics = Column(Text, nullable=True)  # JSON string of topic tags
     upvotes = Column(Integer, default=0)
     downvotes = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
@@ -67,6 +72,7 @@ class Response(Base):
     question_id = Column(Integer, ForeignKey("questions.id"), nullable=False)
     user_answer = Column(Text, nullable=False)
     is_correct = Column(Boolean, nullable=True)
+    feedback = Column(Text, nullable=True)  # AI-generated feedback
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     user = relationship("User", back_populates="responses")
