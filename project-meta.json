@@ -1,4 +1,25 @@
 {
+  "name": "Medschool ArborTester",
+  "description": "An AI chatbot for medical students to prepare for board exams.",
+  "technologies": [
+    "Docker",
+    "AI",
+    "OAuth",
+    "GCP",
+    "AWS",
+    "Azure"
+  ],
+  "category": [
+    "chatbot",
+    "data-analysis",
+    "education"
+  ],
+  "status": "active",
+  "language": [
+    "Python",
+    "JavaScript"
+  ],
+  "hosted_url": null,
   "activity": {
     "commits_30d": 1,
     "last_commit": "2025-08-07",
