@@ -1,1 +1,8 @@
-{"name":"Medschool ArborTester","description":"An interactive chatbot for medical board exam prep. Engage with clinical questions and track performance.","technologies":["Docker","AI","GCP","Azure","AWS"],"category":["chatbot","data-analysis","dashboard"],"status":"active","language":["Python","JavaScript"],"hosted_url":null}
+{
+  "activity": {
+    "commits_30d": 1,
+    "last_commit": "2025-08-07",
+    "contributors": 0,
+    "hotness_score": 32
+  }
+}
