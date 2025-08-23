@@ -36,3 +36,7 @@ app.include_router(analytics_router.router, prefix="/api/v1/analytics", tags=["A
 @app.get("/")
 def read_root():
     return {"status": "ok"}
+
+@app.get("/healthz")
+def health_check():
+    return {"status": "healthy"}
