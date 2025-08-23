@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 COPY . /app
 
 # Expose port 8000 to the outside world
-EXPOSE 8000
+EXPOSE 10000
 
 # Command to run the application using uvicorn
 # --host 0.0.0.0 makes the server accessible from outside the container
