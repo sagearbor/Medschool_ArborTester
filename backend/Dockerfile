@@ -2,13 +2,22 @@ FROM python:3.11
 
 WORKDIR /app
 
+# Copy requirements first for better layer caching
 COPY ./requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-COPY . /app
+# Copy everything from backend directory
+COPY . /app/backend/
 
-# Create the startup script BEFORE CMD
+# Copy the root alembic.ini to the working directory
+COPY ../alembic.ini /app/alembic.ini
+
+# Set Python path to include the app directory 
+ENV PYTHONPATH=/app
+
+# Create the startup script
 RUN echo '#!/bin/bash' > start.sh && \
+    echo 'cd /app' >> start.sh && \
     echo 'python -m alembic upgrade head' >> start.sh && \
     echo 'python -m uvicorn backend.main:app --host 0.0.0.0 --port 10000' >> start.sh && \
     chmod +x start.sh
