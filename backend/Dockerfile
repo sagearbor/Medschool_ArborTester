@@ -19,3 +19,8 @@ EXPOSE 10000
 # Command to run the application using uvicorn
 # --host 0.0.0.0 makes the server accessible from outside the container
 CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "10000"]
+
+# Create a simple startup script
+RUN echo '#!/bin/bash\npython -m alembic upgrade head\npython -m uvicorn backend.main:app --host 0.0.0.0 --port 10000' > start.sh && chmod +x start.sh
+
+CMD ["./start.sh"]
