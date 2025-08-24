@@ -1,19 +1,38 @@
 import os
 import logging
 from typing import Dict, List, Optional
-from openai import AzureOpenAI
+from openai import AzureOpenAI, OpenAI
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 class OpenAIService:
     def __init__(self):
-        self.client = AzureOpenAI(
-            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-            api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-01"),
-            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
-        )
-        self.deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "gpt-4")
+        # Check which OpenAI service to use based on available environment variables
+        if os.getenv("AZURE_OPENAI_API_KEY") and os.getenv("AZURE_OPENAI_ENDPOINT"):
+            # Use Azure OpenAI
+            self.client = AzureOpenAI(
+                api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+                api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-01"),
+                azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
+            )
+            self.deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "gpt-4")
+            self.provider = "azure"
+            logger.info("Using Azure OpenAI service")
+        elif os.getenv("OPENAI_API_KEY"):
+            # Use standard OpenAI
+            self.client = OpenAI(
+                api_key=os.getenv("OPENAI_API_KEY")
+            )
+            self.deployment_name = os.getenv("OPENAI_MODEL", "gpt-4")
+            self.provider = "openai"
+            logger.info("Using standard OpenAI service")
+        else:
+            raise ValueError(
+                "Missing OpenAI credentials. Please provide either:\n"
+                "- Azure OpenAI: AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT\n"
+                "- Standard OpenAI: OPENAI_API_KEY"
+            )
     
     def generate_clinical_question(self, 
                                  specialty: str = "General Medicine",
