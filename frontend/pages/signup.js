@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { getApiUrl } from '../config/api';
 
 export default function Signup() {
     const [name, setName] = useState('');
@@ -31,7 +32,7 @@ export default function Signup() {
         setLoading(true);
         
         try {
-            await axios.post('http://localhost:8000/api/v1/auth/signup', { name, email, password });
+            await axios.post(getApiUrl('/api/v1/auth/signup'), { name, email, password });
             setMessage('Account created successfully! Redirecting to login...');
             setTimeout(() => router.push('/login'), 2000);
         } catch (err) {

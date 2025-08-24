@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { createApiConfig } from '../config/api';
 
 const createApiClient = (token) => {
-    const apiClient = axios.create({
-        baseURL: 'http://localhost:8000',
-    });
+    const apiClient = axios.create(createApiConfig());
     apiClient.interceptors.request.use((config) => {
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;

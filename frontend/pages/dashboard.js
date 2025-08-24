@@ -4,11 +4,10 @@ import Link from 'next/link';
 import axios from 'axios';
 import PerformanceDashboard from '../components/PerformanceDashboard';
 import Navigation from '../components/Navigation';
+import { createApiConfig } from '../config/api';
 
 const createApiClient = (token) => {
-    const apiClient = axios.create({
-        baseURL: 'http://localhost:8000',
-    });
+    const apiClient = axios.create(createApiConfig());
     apiClient.interceptors.request.use((config) => {
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;

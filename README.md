@@ -52,7 +52,7 @@ Mock Data: Factory Boy for generating predictable test data.
 
 Containerization: Docker & Docker Compose for creating consistent, isolated, and portable development and deployment environments.
 
-AI & Machine Learning: Google's Gemini API for generating high-quality questions and explanations.
+AI & Machine Learning: Flexible AI integration supporting both standard OpenAI and Azure OpenAI for generating high-quality questions and explanations, with automatic provider detection based on available credentials.
 
 Getting Started (Local Development)
 This project uses Docker Compose to simplify the local development setup. You can launch the entire backend stack (API server and database) with a single command.
@@ -80,7 +80,12 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 
-# Azure OpenAI (required for question generation)
+# AI Service Configuration (choose one)
+# Option 1: Standard OpenAI
+OPENAI_API_KEY=your-openai-api-key
+OPENAI_MODEL=gpt-4
+
+# Option 2: Azure OpenAI
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
 AZURE_OPENAI_API_KEY=your-azure-openai-api-key
 AZURE_OPENAI_API_VERSION=2024-02-01
@@ -112,6 +117,22 @@ npm install
 npm run dev
 
 The React application will be available at http://localhost:3000.
+
+**Frontend Environment Variables (Optional):**
+
+The frontend automatically detects the API URL based on the environment. For custom configurations, create a `.env.local` file in the `frontend/` directory:
+
+```bash
+# Frontend Environment Variables (optional)
+# For local development, defaults to http://localhost:8000
+# For production deployment, set to your backend URL
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+For production deployment (e.g., Render.com), set:
+```bash
+NEXT_PUBLIC_API_URL=https://your-backend-domain.onrender.com
+```
 
 ## Development vs Production Commands
 

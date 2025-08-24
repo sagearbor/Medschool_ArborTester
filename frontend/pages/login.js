@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { getApiUrl } from '../config/api';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -20,7 +21,7 @@ export default function Login() {
             formData.append('username', email);
             formData.append('password', password);
 
-            const response = await axios.post('http://localhost:8000/api/v1/auth/login', formData, {
+            const response = await axios.post(getApiUrl('/api/v1/auth/login'), formData, {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             });
             
@@ -115,7 +116,7 @@ export default function Login() {
                     {/* Google Sign In */}
                     <div className="mt-6">
                         <a
-                            href="http://localhost:8000/api/v1/auth/google/login"
+                            href={getApiUrl("/api/v1/auth/google/login")}
                             className="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition duration-200"
                         >
                             <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">

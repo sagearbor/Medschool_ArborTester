@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { getApiUrl } from '../config/api';
 
 export default function SsoLogin() {
     const [email, setEmail] = useState('');
@@ -11,7 +12,7 @@ export default function SsoLogin() {
         setError('');
         setMessage('');
         try {
-            const response = await axios.post('http://localhost:8000/api/v1/auth/sso/login', { email });
+            const response = await axios.post(getApiUrl('/api/v1/auth/sso/login'), { email });
             setMessage(response.data.message);
         } catch (err) {
             setError(err.response?.data?.detail || 'An error occurred.');
