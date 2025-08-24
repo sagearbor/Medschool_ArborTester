@@ -3,14 +3,14 @@ FROM python:3.11
 WORKDIR /app
 
 # Copy requirements first for better layer caching
-COPY ./requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
+COPY ./backend/requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir --upgrade --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org -r requirements.txt
 
 # Copy everything from backend directory
-COPY . /app/backend/
+COPY ./backend /app/backend/
 
 # Copy the root alembic.ini to the working directory
-COPY ../alembic.ini /app/alembic.ini
+COPY ./alembic.ini /app/alembic.ini
 
 # Set Python path to include the app directory 
 ENV PYTHONPATH=/app

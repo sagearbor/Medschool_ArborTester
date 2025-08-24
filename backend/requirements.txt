@@ -1,4 +1,6 @@
 fastapi
+pydantic[email]
+python-multipart
 uvicorn[standard]
 sqlalchemy
 psycopg2-binary
