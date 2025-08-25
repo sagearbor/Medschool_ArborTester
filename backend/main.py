@@ -46,6 +46,9 @@ async def startup_event():
         # Check and add missing columns to questions table
         missing_columns = [
             "ALTER TABLE questions ADD COLUMN IF NOT EXISTS options TEXT",
+            "ALTER TABLE questions ADD COLUMN IF NOT EXISTS correct_answer VARCHAR",
+            "ALTER TABLE questions ADD COLUMN IF NOT EXISTS explanation TEXT",
+            "ALTER TABLE questions ADD COLUMN IF NOT EXISTS difficulty VARCHAR",
             "ALTER TABLE questions ADD COLUMN IF NOT EXISTS topics TEXT", 
             "ALTER TABLE questions ADD COLUMN IF NOT EXISTS disciplines TEXT",
             "ALTER TABLE questions ADD COLUMN IF NOT EXISTS body_systems TEXT",
