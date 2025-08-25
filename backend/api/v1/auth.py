@@ -1,5 +1,6 @@
 import os
 from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from authlib.integrations.starlette_client import OAuth
@@ -72,16 +73,15 @@ async def google_login(request: Request):
     redirect_uri = request.url_for('google_callback')
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
-@router.get('/google/callback', response_model=schemas.Token)
+@router.get('/google/callback')
 async def google_callback(request: Request, db: Session = Depends(get_db)):
     token = await oauth.google.authorize_access_token(request)
     user_info = token.get('userinfo')
 
     if not user_info:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Could not retrieve user info from Google."
-        )
+        # Redirect to frontend with error
+        frontend_url = os.getenv("FRONTEND_URL", "https://medschool-frontend.onrender.com")
+        return RedirectResponse(url=f"{frontend_url}/login?error=oauth_failed")
 
     user = get_or_create_user_from_identity(
         db=db,
@@ -92,7 +92,10 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
     )
 
     access_token = create_access_token(data={"sub": str(user.id)})
-    return {"access_token": access_token, "token_type": "bearer"}
+    
+    # Redirect to frontend login page with token
+    frontend_url = os.getenv("FRONTEND_URL", "https://medschool-frontend.onrender.com")
+    return RedirectResponse(url=f"{frontend_url}/login?token={access_token}")
 
 @router.post("/sso/login")
 def sso_login(email: schemas.EmailStr, db: Session = Depends(get_db)):

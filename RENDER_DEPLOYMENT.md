@@ -8,6 +8,7 @@
 - Database name: `medboard-db`
 - User: `medboard_user` (auto-generated)
 - Copy the **Internal Database URL** (starts with `postgresql://`)
+     - postgresql://medboard_db_user:MZWTAlShLzaor6n1zNBuwDAlcLXTomIo@dpg-d2kkt03ipnbc73f7pmi0-a/medboard_db
 
 ## 2. Backend Service Environment Variables
 

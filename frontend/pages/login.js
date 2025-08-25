@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -10,6 +10,24 @@ export default function Login() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+
+    // Handle OAuth token from URL (for Google login redirect)
+    useEffect(() => {
+        const { token, error: oauthError } = router.query;
+        
+        if (token) {
+            // Store OAuth token and redirect to dashboard
+            localStorage.setItem('authToken', token);
+            router.push('/dashboard');
+        } else if (oauthError) {
+            // Handle OAuth errors
+            if (oauthError === 'oauth_failed') {
+                setError('Google login failed. Please try again.');
+            } else if (oauthError === 'no_token') {
+                setError('Authentication failed. Please try logging in again.');
+            }
+        }
+    }, [router.query, router]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
