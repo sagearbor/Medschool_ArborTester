@@ -1,10 +1,14 @@
 import os
 from logging.config import fileConfig
+from dotenv import load_dotenv
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
+
+# Load environment variables
+load_dotenv()
 
 config = context.config
 
@@ -18,7 +22,7 @@ from models import Base
 target_metadata = Base.metadata
 
 def get_url():
-    return os.getenv("DATABASE_URL")
+    return os.getenv("DATABASE_URL", "postgresql://medboard_user:medboard_pass@localhost:5432/medboard_db")
 
 def run_migrations_offline() -> None:
     url = get_url()

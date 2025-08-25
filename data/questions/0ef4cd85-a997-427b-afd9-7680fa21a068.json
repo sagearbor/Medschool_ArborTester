@@ -1,0 +1,16 @@
+{
+  "content": "What is the most common cause of chest pain?",
+  "discipline": "Cardiology",
+  "options": {
+    "A": "Heart attack",
+    "B": "Anxiety",
+    "C": "Muscle strain",
+    "D": "GERD"
+  },
+  "correct_answer": "A",
+  "explanation": "While many conditions can cause chest pain, cardiac causes should always be considered first.",
+  "difficulty": "Intermediate",
+  "user_id": "ce9986d2-e7f1-4344-b547-d76a82c18dcd",
+  "id": "0ef4cd85-a997-427b-afd9-7680fa21a068",
+  "created_at": "2025-08-25T01:40:06.916930"
+}

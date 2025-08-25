@@ -1,0 +1,8 @@
+{
+  "email": "test@example.com",
+  "name": "Test User",
+  "password_hash": "$2b$12$Qem0MO9j3hytR7c57knSWeoFAf1yuyGcpPaV/uy14LdPsKp8I6/Fa",
+  "provider": "password",
+  "id": "ce9986d2-e7f1-4344-b547-d76a82c18dcd",
+  "created_at": "2025-08-25T01:40:06.916397"
+}
