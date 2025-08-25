@@ -38,7 +38,8 @@
       "Bash(docker build:*)",
       "Bash(docker run:*)",
       "Bash(PYTHONPATH=\"/home/scb2/PROJECTS/gitRepos/Medschool_ArborTester\" python -c \"\nimport os\nos.environ[''AZURE_OPENAI_API_KEY''] = ''test-key''\nos.environ[''AZURE_OPENAI_ENDPOINT''] = ''https://test.openai.azure.com''\nfrom backend.services.openai_service import OpenAIService\ntry:\n    service = OpenAIService()\n    print(f''✅ Service initialized successfully'')\n    print(f''Provider: {service.provider}'')\n    print(f''Model: {service.deployment_name}'')\nexcept Exception as e:\n    print(f''❌ Error: {e}'')\n\")",
-      "Bash(docker-compose:*)"
+      "Bash(docker-compose:*)",
+      "Bash(alembic:*)"
     ],
     "deny": []
   }
