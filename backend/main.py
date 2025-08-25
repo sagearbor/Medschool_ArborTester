@@ -24,7 +24,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000", 
         "http://localhost:3001",
-        "https://*.onrender.com"  # Allow all Render.com subdomains
+        "*"  # Allow all origins for now (can restrict later)
     ],
     allow_credentials=True,
     allow_methods=["*"],
